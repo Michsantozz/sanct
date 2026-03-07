@@ -6,12 +6,33 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "agent:dev": "tsx src/agent/agent.ts dev",
+    "agent:connect": "tsx src/agent/agent.ts connect --room SanctuaryRoom"
   },
   "dependencies": {
+    "@livekit/agents": "^1.0.48",
+    "@livekit/agents-plugin-google": "^1.0.48",
+    "@livekit/components-react": "^2.9.20",
+    "@radix-ui/react-use-controllable-state": "^1.2.2",
+    "@streamdown/cjk": "^1.0.2",
+    "@streamdown/code": "^1.1.0",
+    "@streamdown/math": "^1.0.2",
+    "@streamdown/mermaid": "^1.0.2",
+    "ai": "^6.0.116",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "dotenv": "^17.3.1",
+    "livekit-client": "^2.17.2",
+    "livekit-server-sdk": "^2.15.0",
+    "lucide-react": "^0.577.0",
+    "motion": "^12.35.0",
     "next": "16.1.6",
+    "radix-ui": "^1.4.3",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "streamdown": "^2.4.0",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -20,7 +41,13 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
+    "shadcn": "^3.8.5",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
+    "tw-animate-css": "^1.4.0",
     "typescript": "^5"
+  },
+  "overrides": {
+    "@google/genai": "1.34.0"
   }
 }
