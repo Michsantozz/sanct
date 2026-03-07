@@ -13,12 +13,14 @@ import {
   CircleDotIcon,
   ClipboardListIcon,
   ClockIcon,
+  CopyIcon,
   EarIcon,
   FileTextIcon,
   HeartPulseIcon,
   MicIcon,
   MoonIcon,
   PillIcon,
+  PlayIcon,
   ShieldAlertIcon,
   SparklesIcon,
   SunIcon,
@@ -332,40 +334,53 @@ function ResumoAtendimento() {
   );
 }
 
-function MedicacaoTurno({ turno }: { turno: TurnoMedicacao }) {
+function RotinaMedicamentos({ turnos }: { turnos: TurnoMedicacao[] }) {
   const config = {
-    manha: { icon: SunIcon, label: "Manhã", cor: "text-[#B05A36]", bg: "bg-card border-[#B05A36]/20", iconBg: "bg-[#B05A36]/10", accent: "border-l-4 border-l-[#B05A36]/50" },
-    tarde: { icon: SunsetIcon, label: "Tarde", cor: "text-muted-foreground", bg: "bg-secondary/60 border-border", iconBg: "bg-background", accent: "border-l-4 border-l-border" },
-    noite: { icon: MoonIcon, label: "Noite", cor: "text-[#2A9D8F]", bg: "bg-card border-[#2A9D8F]/20", iconBg: "bg-[#2A9D8F]/10", accent: "border-l-4 border-l-[#2A9D8F]/50" },
+    manha: { icon: SunIcon, label: "Manhã", cor: "text-[#B05A36]", iconBg: "bg-[#B05A36]/10" },
+    tarde: { icon: SunsetIcon, label: "Tarde", cor: "text-muted-foreground", iconBg: "bg-secondary" },
+    noite: { icon: MoonIcon, label: "Noite", cor: "text-[#2A9D8F]", iconBg: "bg-[#2A9D8F]/10" },
   };
-  const c = config[turno.turno];
-  const Icon = c.icon;
 
   return (
-    <div className={cn("flex-1 rounded-xl border p-3 md:p-4", c.bg, c.accent)}>
-      <div className="mb-3 flex items-center gap-2">
-        <div className={cn("flex size-7 items-center justify-center rounded-lg", c.iconBg)}>
-          <Icon className={cn("size-4", c.cor)} />
-        </div>
-        <span className={cn("text-sm font-semibold", c.cor)}>{c.label}</span>
-      </div>
-      {turno.medicamentos.length === 0 ? (
-        <p className="text-xs text-muted-foreground italic">Nenhum remédio neste período</p>
-      ) : (
-        <div className="space-y-2">
-          {turno.medicamentos.map((med) => (
-            <div key={med.nome} className="flex items-start justify-between gap-1">
-              <div>
-                <p className="text-sm font-medium text-foreground leading-tight">{med.nome}</p>
-                <p className="text-xs text-muted-foreground">{med.dose}</p>
+    <div className="overflow-hidden rounded-2xl border bg-card shadow-[0_4px_24px_rgba(0,0,0,0.06)] divide-y">
+      {turnos.map((turno) => {
+        const c = config[turno.turno];
+        const Icon = c.icon;
+        const vazio = turno.medicamentos.length === 0;
+        return (
+          <div key={turno.turno} className={cn("flex items-start gap-3 px-4 py-3.5 md:gap-4", vazio && "opacity-50")}>
+            {/* Label turno */}
+            <div className="flex w-16 shrink-0 flex-col items-center gap-1 pt-0.5 md:w-20">
+              <div className={cn("flex size-7 items-center justify-center rounded-lg", c.iconBg)}>
+                <Icon className={cn("size-3.5", c.cor)} />
               </div>
-              {med.novo && (
-                <span className="shrink-0 rounded-full bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">Novo</span>
+              <span className={cn("text-[0.6875rem] font-semibold tracking-widest uppercase", c.cor)}>{c.label}</span>
+            </div>
+            {/* Medicamentos como pills */}
+            <div className="flex flex-1 flex-wrap items-center gap-1.5 pt-1">
+              {vazio ? (
+                <span className="text-xs italic text-muted-foreground">Nenhum remédio</span>
+              ) : (
+                turno.medicamentos.map((med) => (
+                  <span
+                    key={med.nome}
+                    className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-foreground"
+                  >
+                    <span>{med.nome}</span>
+                    <span className="text-muted-foreground">·</span>
+                    <span className="text-muted-foreground">{med.dose}</span>
+                    {med.novo && (
+                      <span className="ml-0.5 rounded-full bg-primary/10 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-primary">
+                        Novo
+                      </span>
+                    )}
+                  </span>
+                ))
               )}
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -457,27 +472,71 @@ export default function PainelPacienteSegriniPage() {
       <main className="mx-auto max-w-6xl px-4 py-4 md:px-6 md:py-8">
 
         {/* Patient card */}
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }} className="rounded-2xl border bg-card p-4 shadow-[0_4px_24px_rgba(0,0,0,0.06)] md:p-6">
-          {/* Top row: avatar + info */}
-          <div className="flex items-start gap-3">
-            <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-sm font-bold text-primary md:size-14 md:text-lg">JP</div>
-            <div className="min-w-0 flex-1">
-              <h1 className="text-lg font-semibold text-foreground md:text-xl">{PATIENT.name}</h1>
-              <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">{PATIENT.age} anos · Prontuário {PATIENT.prontuario}</p>
-              <p className="text-xs text-muted-foreground">Responsável: {PATIENT.responsavel}</p>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }} className="rounded-2xl border bg-card px-4 pb-3 pt-4 shadow-[0_4px_24px_rgba(0,0,0,0.06)] md:px-6 md:pb-4 md:pt-5">
+
+          {/* Layout: esquerda (nome + botões) · direita (badges + retorno) */}
+          <div className="flex items-stretch justify-between gap-4">
+
+            {/* Esquerda: avatar + nome + badges mobile + botões */}
+            <div className="flex min-w-0 flex-1 flex-col gap-3">
+              <div className="flex items-start gap-3">
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-sm font-bold text-primary md:size-14 md:text-lg">JP</div>
+                <div className="min-w-0">
+                  <h1 className="text-lg font-semibold text-foreground md:text-xl">{PATIENT.name}</h1>
+                  <p className="mt-0.5 text-xs text-muted-foreground md:text-sm">{PATIENT.age} anos · Prontuário {PATIENT.prontuario}</p>
+                  <p className="text-xs text-muted-foreground">Responsável: {PATIENT.responsavel}</p>
+                </div>
+              </div>
+              {/* Badges — mobile only */}
+              <div className="flex flex-wrap items-center gap-2 md:hidden">
+                <span className="rounded-lg bg-[#B05A36]/10 px-2.5 py-1 text-[0.6875rem] font-semibold tracking-widest uppercase text-[#B05A36]">{PATIENT.cid}</span>
+                <span className="rounded-lg bg-secondary px-2.5 py-1 text-[0.6875rem] font-semibold tracking-widest uppercase text-muted-foreground">Pediátrico</span>
+              </div>
+              {/* Botões */}
+              <div className="mt-auto flex flex-wrap items-center gap-2">
+                <Button className="flex h-9 items-center gap-2 rounded-full bg-primary px-5 text-xs font-semibold text-primary-foreground shadow-[0_4px_20px_rgba(176,90,54,0.22)] transition-all hover:bg-primary/90">
+                  <PlayIcon className="size-3.5 shrink-0 fill-current" />
+                  Ouvir Transcrição
+                </Button>
+                <Button variant="outline" className="flex h-9 items-center gap-1.5 rounded-full border-border bg-transparent px-4 text-xs font-semibold text-foreground transition-all hover:bg-secondary">
+                  <FileTextIcon className="size-3.5 shrink-0" />
+                  Exportar PDF
+                </Button>
+                <Button variant="outline" className="flex h-9 items-center gap-1.5 rounded-full border-border bg-transparent px-4 text-xs font-semibold text-foreground transition-all hover:bg-secondary">
+                  <CopyIcon className="size-3.5 shrink-0" />
+                  Copiar Prontuário
+                </Button>
+              </div>
             </div>
+
+            {/* Direita: badges + retorno — desktop only */}
+            <div className="hidden shrink-0 flex-col items-end gap-1.5 md:flex">
+              <span className="rounded-lg bg-[#B05A36]/10 px-2.5 py-1 text-[0.6875rem] font-semibold tracking-widest uppercase text-[#B05A36]">{PATIENT.cid}</span>
+              <span className="rounded-lg bg-secondary px-2.5 py-1 text-[0.6875rem] font-semibold tracking-widest uppercase text-muted-foreground">Pediátrico</span>
+              <div className="mt-1.5 flex items-center gap-2 rounded-xl border border-[#2A9D8F]/20 bg-[#2A9D8F]/5 px-3 py-2 text-right">
+                <div>
+                  <p className="text-[10px] font-medium uppercase tracking-widest text-[#2A9D8F]">Próximo retorno</p>
+                  <p className="text-sm font-semibold text-foreground">21 de Março, 2026</p>
+                  <p className="text-[10px] text-muted-foreground">em 14 dias · Dr. Gustavo</p>
+                </div>
+                <CalendarIcon className="size-4 shrink-0 text-[#2A9D8F]" />
+              </div>
+            </div>
+
           </div>
-          {/* Badges */}
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="rounded-lg bg-[#B05A36]/10 px-2.5 py-1 text-[0.6875rem] font-semibold tracking-widest uppercase text-[#B05A36]">{PATIENT.cid}</span>
-            <span className="rounded-lg bg-secondary px-2.5 py-1 text-[0.6875rem] font-semibold tracking-widest uppercase text-muted-foreground">Pediátrico</span>
-          </div>
-          {/* Meta info */}
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 border-t pt-3 text-xs text-muted-foreground">
+
+          {/* Meta info — rodapé do card */}
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 border-t pt-2 text-xs text-muted-foreground">
             <div className="flex items-center gap-1.5"><CalendarIcon className="size-3.5" />{PATIENT.dataConsulta}</div>
             <div className="flex items-center gap-1.5"><ClockIcon className="size-3.5" />{PATIENT.horaConsulta} · {PATIENT.duracaoConsulta}</div>
             <div className="flex items-center gap-1.5"><MicIcon className="size-3.5" />{PATIENT.fonteAudio}</div>
+            {/* Retorno — visível no mobile (desktop já aparece no canto direito) */}
+            <div className="flex items-center gap-1.5 md:hidden">
+              <CalendarIcon className="size-3.5 text-[#2A9D8F]" />
+              <span className="font-medium text-[#2A9D8F]">Retorno: 21/03 · em 14 dias</span>
+            </div>
           </div>
+
         </motion.div>
 
         <div className="mt-5 grid gap-5 lg:grid-cols-3">
@@ -524,11 +583,7 @@ export default function PainelPacienteSegriniPage() {
                 <PillIcon className="size-4 text-primary" />
                 <h2 className="text-[0.6875rem] font-semibold tracking-widest uppercase text-foreground">Rotina de Medicamentos</h2>
               </div>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                {MEDICACOES_TURNO.map((turno) => (
-                  <MedicacaoTurno key={turno.turno} turno={turno} />
-                ))}
-              </div>
+              <RotinaMedicamentos turnos={MEDICACOES_TURNO} />
             </motion.section>
 
             {/* ── 2. Escalas Clínicas ───────────────────────────────────── */}
@@ -590,36 +645,15 @@ export default function PainelPacienteSegriniPage() {
               </Button>
             </motion.section>
 
-            {/* Retorno */}
-            <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5, duration: 0.4 }} className="rounded-xl border bg-card p-4 shadow-[0_4px_24px_rgba(0,0,0,0.06)]">
-              <div className="flex items-center gap-3">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-secondary">
-                  <CalendarIcon className="size-5 text-muted-foreground" />
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground">Próximo retorno</p>
-                  <p className="text-sm font-semibold text-foreground">21 de Março, 2026</p>
-                  <p className="text-[11px] text-muted-foreground">em 14 dias · Dr. Gustavo</p>
-                </div>
-              </div>
-            </motion.section>
 
           </div>
         </div>
 
         {/* Footer */}
-        <div className="mt-6 flex flex-col items-center gap-2 border-t pt-5 pb-8 text-center md:mt-10 md:pt-6">
+        <div className="mt-6 border-t pt-5 pb-8 text-center md:mt-10 md:pt-6">
           <p className="text-[11px] text-muted-foreground">
-            Análise gerada por IA a partir de transcrição via <span className="font-medium">{PATIENT.fonteAudio}</span>. Documento de apoio clínico — não substitui avaliação médica presencial.
+            Análise gerada por IA · <span className="font-medium">{PATIENT.fonteAudio}</span> · Documento de apoio clínico, não substitui avaliação médica presencial.
           </p>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" className="h-7 text-[11px] text-muted-foreground hover:text-foreground">
-              <FileTextIcon className="size-3" /> Exportar PDF
-            </Button>
-            <Button variant="ghost" size="sm" className="h-7 text-[11px] text-muted-foreground hover:text-foreground">
-              <ClipboardListIcon className="size-3" /> Copiar para Prontuário
-            </Button>
-          </div>
         </div>
 
       </main>

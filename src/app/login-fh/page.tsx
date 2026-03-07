@@ -40,6 +40,33 @@ const ptSerif = PT_Serif({
 
 export default function LoginFHPage() {
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      if (res.ok) {
+        window.location.href = "/painel-paciente-segrini";
+      } else {
+        const data = await res.json();
+        setError(data.error ?? "Erro ao autenticar.");
+      }
+    } catch {
+      setError("Erro de conexão. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  }
 
   return (
     <div
@@ -77,25 +104,25 @@ export default function LoginFHPage() {
               {/* Heading */}
               <div className="mb-8 space-y-2">
                 <h1 className="text-3xl font-light tracking-tight text-foreground">
-                  Bem-vinda,{" "}
+                  Bem-vindo,{" "}
                   <em
                     className={cn(
                       "not-italic font-normal text-primary",
                       ptSerif.className
                     )}
                   >
-                    Doutora
+                    Doutor
                   </em>
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                  Acesse o painel de acompanhamento dos seus pacientes
+                  Acesse seus painéis de consulta, pacientes e transcrições
                 </p>
               </div>
 
               {/* Form fields */}
               <form
                 className="space-y-5"
-                onSubmit={(e) => e.preventDefault()}
+                onSubmit={handleSubmit}
               >
                 {/* Email */}
                 <div className="space-y-2">
@@ -110,7 +137,9 @@ export default function LoginFHPage() {
                     <Input
                       id="email"
                       type="email"
-                      placeholder="dra.mariana@clinica.com.br"
+                      placeholder="dr.gustavo@elah.com.br"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                       className="h-12 rounded-xl border-border bg-card pl-11 pr-4 text-sm shadow-sm placeholder:text-muted-foreground/60 focus-visible:ring-primary"
                     />
                   </div>
@@ -138,6 +167,8 @@ export default function LoginFHPage() {
                       id="password"
                       type={showPassword ? "text" : "password"}
                       placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                       className="h-12 rounded-xl border-border bg-card pl-11 pr-12 text-sm shadow-sm placeholder:text-muted-foreground/60 focus-visible:ring-primary"
                     />
                     <button
@@ -154,12 +185,20 @@ export default function LoginFHPage() {
                   </div>
                 </div>
 
+                {/* Erro */}
+                {error && (
+                  <p className="rounded-lg bg-destructive/10 px-4 py-2.5 text-xs font-medium text-destructive">
+                    {error}
+                  </p>
+                )}
+
                 {/* Submit */}
                 <Button
                   type="submit"
-                  className="h-12 w-full rounded-xl bg-primary text-sm font-semibold tracking-wide text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-md"
+                  disabled={loading}
+                  className="h-12 w-full rounded-xl bg-primary text-sm font-semibold tracking-wide text-primary-foreground shadow-sm transition-all duration-200 hover:bg-primary/90 hover:shadow-md disabled:opacity-60"
                 >
-                  Entrar no Painel
+                  {loading ? "Entrando…" : "Entrar no Painel"}
                 </Button>
 
                 {/* Separator */}
@@ -278,13 +317,13 @@ export default function LoginFHPage() {
                   ptSerif.className
                 )}
               >
-                Cuidar começa por{" "}
-                <em className="text-[#E8A97A]">ouvir</em>
+                Da consulta ao painel do paciente,{" "}
+                <em className="text-[#E8A97A]">automaticamente</em>
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-white/50">
-                O ELAH oferece um espaço seguro de escuta terapêutica para
-                seus pacientes com Síndrome do Jaleco Branco. Acompanhe o
-                progresso e os insights de cada sessão.
+                O ELAH grava, transcreve e estrutura cada consulta em tempo
+                real. Exame psíquico, conduta e resumo do paciente gerados
+                por IA — para o médico focar no que importa.
               </p>
             </motion.div>
 
@@ -296,9 +335,9 @@ export default function LoginFHPage() {
               className="mt-12 flex gap-8"
             >
               {[
-                { value: "94%", label: "Redução de ansiedade", icon: ActivityIcon },
-                { value: "2.4k", label: "Sessões realizadas", icon: HeartPulseIcon },
-                { value: "4.9", label: "Satisfação média", icon: ShieldCheckIcon },
+                { value: "42min", label: "Consulta transcrita", icon: ActivityIcon },
+                { value: "< 30s", label: "Painel gerado por IA", icon: HeartPulseIcon },
+                { value: "100%", label: "Automático via áudio", icon: ShieldCheckIcon },
               ].map((stat) => (
                 <div key={stat.label} className="text-center">
                   <stat.icon className="mx-auto mb-2 size-4 text-[#B05A36]/60" />
@@ -325,20 +364,20 @@ export default function LoginFHPage() {
                   ptSerif.className
                 )}
               >
-                &ldquo;Meus pacientes relatam se sentir mais confortáveis nas
-                consultas depois de usar o ELAH. A redução de PA reativa é
-                visível nos dados.&rdquo;
+                &ldquo;O painel que o ELAH gera é o que eu sempre quis
+                entregar no final da consulta. Limpo, humano, sem jargão
+                médico. Os pais entendem tudo.&rdquo;
               </p>
               <div className="mt-4 flex items-center gap-3">
                 <div className="flex size-8 items-center justify-center rounded-full bg-[#B05A36]/30 text-xs font-bold text-[#E8A97A]">
-                  RC
+                  GS
                 </div>
                 <div>
                   <p className="text-xs font-medium text-white/70">
-                    Dra. Renata Castro
+                    Dr. Gustavo Segrini
                   </p>
                   <p className="text-[11px] text-white/35">
-                    Cardiologista — Hospital Sírio-Libanês
+                    Médico de Família — Saúde Mental · ES
                   </p>
                 </div>
               </div>
