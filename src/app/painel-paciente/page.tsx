@@ -334,10 +334,10 @@ function ExamCard({
           open ? "shadow-sm ring-1 ring-primary/10" : "hover:shadow-sm"
         )}
       >
-        <div className="flex items-start gap-3 px-4 py-3.5">
+        <div className="flex items-start gap-3 px-3 py-3 md:px-4 md:py-3.5">
           <div
             className={cn(
-              "mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg",
+              "mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg md:size-8",
               item.severity === "normal" && "bg-[#2A9D8F]/10 text-[#2A9D8F]",
               item.severity === "attention" && "bg-amber-500/10 text-amber-600",
               item.severity === "alert" && "bg-[#B05A36]/10 text-[#B05A36]",
@@ -347,7 +347,7 @@ function ExamCard({
             <Icon className="size-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-1.5 md:gap-2">
               <span className="text-[11px] font-semibold tracking-wider uppercase text-muted-foreground">
                 {item.category}
               </span>
@@ -442,30 +442,30 @@ export default function PainelPacientePage() {
     >
       {/* Header */}
       <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 md:px-6">
-          <div className="flex items-center gap-3">
-            <CircleDotIcon className="size-5 text-primary" />
-            <span className="text-lg font-semibold tracking-wide text-foreground">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 md:h-16 md:px-6">
+          <div className="flex items-center gap-2 md:gap-3">
+            <CircleDotIcon className="size-4 text-primary md:size-5" />
+            <span className="text-base font-semibold tracking-wide text-foreground md:text-lg">
               ELAH
             </span>
-            <Separator orientation="vertical" className="h-5" />
-            <span className="rounded-full bg-secondary px-3 py-1 text-[10px] font-semibold tracking-widest uppercase text-muted-foreground">
+            <Separator orientation="vertical" className="hidden h-5 md:block" />
+            <span className="hidden rounded-full bg-secondary px-3 py-1 text-[10px] font-semibold tracking-widest uppercase text-muted-foreground md:inline-flex">
               Saúde Mental · Família
             </span>
           </div>
-          <div className="flex items-center gap-2.5">
-            <div className="flex size-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+          <div className="flex items-center gap-2">
+            <div className="flex size-7 items-center justify-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground md:size-8">
               GS
             </div>
             <div className="flex flex-col leading-tight">
-              <span className="text-sm font-semibold text-foreground">{PATIENT.medico}</span>
-              <span className="text-[10px] text-muted-foreground">{PATIENT.especialidade}</span>
+              <span className="text-xs font-semibold text-foreground md:text-sm">{PATIENT.medico}</span>
+              <span className="hidden text-[10px] text-muted-foreground md:block">{PATIENT.especialidade}</span>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-8 md:px-6">
+      <main className="mx-auto max-w-6xl px-4 py-4 md:px-6 md:py-8">
         {/* ---------------------------------------------------------------- */}
         {/* Patient header card                                              */}
         {/* ---------------------------------------------------------------- */}
@@ -602,7 +602,7 @@ export default function PainelPacientePage() {
                   {CONDUTA.map((item, i) => (
                     <div
                       key={i}
-                      className="flex items-start gap-3 px-4 py-3"
+                      className="flex items-start gap-3 px-3 py-3 md:px-4"
                     >
                       <span
                         className={cn(
@@ -837,7 +837,7 @@ export default function PainelPacientePage() {
         </div>
 
         {/* Footer */}
-        <div className="mt-10 flex flex-col items-center gap-2 border-t pt-6 pb-8 text-center">
+        <div className="mt-6 flex flex-col items-center gap-2 border-t pt-5 pb-8 text-center md:mt-10 md:pt-6">
           <p className="text-[11px] text-muted-foreground">
             Análise gerada por IA a partir de transcrição via{" "}
             <span className="font-medium">{PATIENT.fonteAudio}</span>.
