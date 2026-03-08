@@ -1,39 +1,25 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const PUBLIC_PATHS = ["/login-fh"];
-const PROTECTED_PATHS = ["/painel-paciente", "/painel-paciente-segrini"];
-
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isAuthenticated = request.cookies.has("elah_auth");
+  const isAuthenticated = request.cookies.get("elah_auth")?.value === "1";
 
-  const isPublic = PUBLIC_PATHS.some(
-    (p) => pathname === p || pathname.startsWith(p + "/")
-  );
-  const isProtected = PROTECTED_PATHS.some(
-    (p) => pathname === p || pathname.startsWith(p + "/")
-  );
+  // Protege o painel — redireciona para login se não autenticado
+  if (pathname.startsWith("/painel-paciente-segrini")) {
+    if (!isAuthenticated) {
+      return NextResponse.redirect(new URL("/login-fh", request.url));
+    }
+  }
 
-  // Já autenticado tentando acessar login → manda pro painel
-  if (isPublic && isAuthenticated) {
+  // Se já autenticado e tentar acessar o login, redireciona para o painel
+  if (pathname.startsWith("/login-fh") && isAuthenticated) {
     return NextResponse.redirect(new URL("/painel-paciente-segrini", request.url));
-  }
-
-  // Rota protegida sem autenticação → manda pro login
-  if (isProtected && !isAuthenticated) {
-    return NextResponse.redirect(new URL("/login-fh", request.url));
-  }
-
-  // Qualquer outra rota não mapeada → redireciona para login ou painel
-  if (!isPublic && !isProtected) {
-    const target = isAuthenticated ? "/painel-paciente-segrini" : "/login-fh";
-    return NextResponse.redirect(new URL(target, request.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/((?!_next|favicon.ico|api|.*\\..*).*)"],
+  matcher: ["/painel-paciente-segrini/:path*", "/login-fh"],
 };
